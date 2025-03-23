@@ -1,0 +1,998 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Brooklyn Mental Health Resources</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    input, select { padding: 8px; margin: 10px 10px 10px 0; width: 100%; max-width: 300px; }
+    .filters { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
+    .card {
+      border: 1px solid #ccc;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Brooklyn Mental Health Resources</h2>
+
+<div class="filters">
+  <input type="text" id="searchInput" placeholder="Search resources..." oninput="renderResources()" />
+  <select id="categoryFilter" onchange="renderResources()">
+    <option value="all">All Neighborhoods</option>
+    <option value="Brooklyn-Wide">Brooklyn-Wide</option>
+<option value="Flatbush">Flatbush</option>
+  </select>
+  <select id="subcategoryFilter" onchange="renderResources()">
+    <option value="all">All Focus Areas</option>
+    <option value="Adults (30-50)">Adults (30-50)</option>
+<option value="Children and Adolescents">Children and Adolescents</option>
+<option value="Men">Men</option>
+<option value="Women">Women</option>
+  </select>
+</div>
+
+<div id="resourceList"></div>
+
+<script>
+const resources = [
+  {
+    "title": "NYC Department of Education School-Based Mental Health Program",
+    "category": "Brooklyn-Wide",
+    "subcategory": "Children and Adolescents",
+    "description": "Provides mental health services within schools, including counseling, crisis intervention, and workshops. Aims to support students' academic and emotional well-being.",
+    "location": "Various schools across Brooklyn",
+    "phone": "(718) 935-2000",
+    "website": "schools.nyc.gov"
+  },
+  {
+    "title": "Girls for Gender Equity (GGE)",
+    "category": "Brooklyn-Wide",
+    "subcategory": "Women",
+    "description": "Offers support groups for women and girls focusing on mental health, empowerment, and gender equity.",
+    "location": "25 Chapel St, Brooklyn, NY 11201",
+    "phone": "(718) 857-1393",
+    "website": "ggenyc.org"
+  },
+  {
+    "title": "Strong Fathers, Stronger Families",
+    "category": "Brooklyn-Wide",
+    "subcategory": "Men",
+    "description": "Offers programs to support fathers, focusing on mental health, including counseling and workshops on parenting skills.",
+    "location": "1368 Fulton St, Brooklyn, NY 11216",
+    "phone": "(718) 636-6900",
+    "website": "restorationplaza.org"
+  },
+  {
+    "title": "Example Resource 4",
+    "category": "Brooklyn-Wide",
+    "subcategory": "Adults (30-50)",
+    "description": "This is a sample description for resource 4.",
+    "location": "4 Main St, Brooklyn, NY 11204",
+    "phone": "(718) 555-1004",
+    "website": "https://example4.org"
+  },
+  {
+    "title": "Example Resource 5",
+    "category": "Flatbush",
+    "subcategory": "Adults (30-50)",
+    "description": "This is a sample description for resource 5.",
+    "location": "5 Main St, Brooklyn, NY 11205",
+    "phone": "(718) 555-1005",
+    "website": "https://example5.org"
+  },
+  {
+    "title": "Example Resource 6",
+    "category": "Brooklyn-Wide",
+    "subcategory": "Children and Adolescents",
+    "description": "This is a sample description for resource 6.",
+    "location": "6 Main St, Brooklyn, NY 11206",
+    "phone": "(718) 555-1006",
+    "website": "https://example6.org"
+  },
+  {
+    "title": "Example Resource 7",
+    "category": "Flatbush",
+    "subcategory": "Adults (30-50)",
+    "description": "This is a sample description for resource 7.",
+    "location": "7 Main St, Brooklyn, NY 11207",
+    "phone": "(718) 555-1007",
+    "website": "https://example7.org"
+  },
+  {
+    "title": "Example Resource 8",
+    "category": "Brooklyn-Wide",
+    "subcategory": "Adults (30-50)",
+    "description": "This is a sample description for resource 8.",
+    "location": "8 Main St, Brooklyn, NY 11208",
+    "phone": "(718) 555-1008",
+    "website": "https://example8.org"
+  },
+  {
+    "title": "Example Resource 9",
+    "category": "Flatbush",
+    "subcategory": "Children and Adolescents",
+    "description": "This is a sample description for resource 9.",
+    "location": "9 Main St, Brooklyn, NY 11209",
+    "phone": "(718) 555-1009",
+    "website": "https://example9.org"
+  },
+  {
+    "title": "Example Resource 10",
+    "category": "Brooklyn-Wide",
+    "subcategory": "Adults (30-50)",
+    "description": "This is a sample description for resource 10.",
+    "location": "10 Main St, Brooklyn, NY 11210",
+    "phone": "(718) 555-1010",
+    "website": "https://example10.org"
+  },
+  {
+    "title": "Example Resource 11",
+    "category": "Flatbush",
+    "subcategory": "Adults (30-50)",
+    "description": "This is a sample description for resource 11.",
+    "location": "11 Main St, Brooklyn, NY 11211",
+    "phone": "(718) 555-1011",
+    "website": "https://example11.org"
+  },
+  {
+    "title": "Example Resource 12",
+    "category": "Brooklyn-Wide",
+    "subcategory": "Children and Adolescents",
+    "description": "This is a sample description for resource 12.",
+    "location": "12 Main St, Brooklyn, NY 11212",
+    "phone": "(718) 555-1012",
+    "website": "https://example12.org"
+  },
+  {
+    "title": "Example Resource 13",
+    "category": "Flatbush",
+    "subcategory": "Adults (30-50)",
+    "description": "This is a sample description for resource 13.",
+    "location": "13 Main St, Brooklyn, NY 11213",
+    "phone": "(718) 555-1013",
+    "website": "https://example13.org"
+  },
+  {
+    "title": "Example Resource 14",
+    "category": "Brooklyn-Wide",
+    "subcategory": "Adults (30-50)",
+    "description": "This is a sample description for resource 14.",
+    "location": "14 Main St, Brooklyn, NY 11214",
+    "phone": "(718) 555-1014",
+    "website": "https://example14.org"
+  },
+  {
+    "title": "Example Resource 15",
+    "category": "Flatbush",
+    "subcategory": "Children and Adolescents",
+    "description": "This is a sample description for resource 15.",
+    "location": "15 Main St, Brooklyn, NY 11215",
+    "phone": "(718) 555-1015",
+    "website": "https://example15.org"
+  },
+  {
+    "title": "Example Resource 16",
+    "category": "Brooklyn-Wide",
+    "subcategory": "Adults (30-50)",
+    "description": "This is a sample description for resource 16.",
+    "location": "16 Main St, Brooklyn, NY 11216",
+    "phone": "(718) 555-1016",
+    "website": "https://example16.org"
+  },
+  {
+    "title": "Example Resource 17",
+    "category": "Flatbush",
+    "subcategory": "Adults (30-50)",
+    "description": "This is a sample description for resource 17.",
+    "location": "17 Main St, Brooklyn, NY 11217",
+    "phone": "(718) 555-1017",
+    "website": "https://example17.org"
+  },
+  {
+    "title": "Example Resource 18",
+    "category": "Brooklyn-Wide",
+    "subcategory": "Children and Adolescents",
+    "description": "This is a sample description for resource 18.",
+    "location": "18 Main St, Brooklyn, NY 11218",
+    "phone": "(718) 555-1018",
+    "website": "https://example18.org"
+  },
+  {
+    "title": "Example Resource 19",
+    "category": "Flatbush",
+    "subcategory": "Adults (30-50)",
+    "description": "This is a sample description for resource 19.",
+    "location": "19 Main St, Brooklyn, NY 11219",
+    "phone": "(718) 555-1019",
+    "website": "https://example19.org"
+  },
+  {
+    "title": "Example Resource 20",
+    "category": "Brooklyn-Wide",
+    "subcategory": "Adults (30-50)",
+    "description": "This is a sample description for resource 20.",
+    "location": "20 Main St, Brooklyn, NY 11220",
+    "phone": "(718) 555-1020",
+    "website": "https://example20.org"
+  },
+  {
+    "title": "Example Resource 21",
+    "category": "Flatbush",
+    "subcategory": "Children and Adolescents",
+    "description": "This is a sample description for resource 21.",
+    "location": "21 Main St, Brooklyn, NY 11221",
+    "phone": "(718) 555-1021",
+    "website": "https://example21.org"
+  },
+  {
+    "title": "Example Resource 22",
+    "category": "Brooklyn-Wide",
+    "subcategory": "Adults (30-50)",
+    "description": "This is a sample description for resource 22.",
+    "location": "22 Main St, Brooklyn, NY 11222",
+    "phone": "(718) 555-1022",
+    "website": "https://example22.org"
+  },
+  {
+    "title": "Example Resource 23",
+    "category": "Flatbush",
+    "subcategory": "Adults (30-50)",
+    "description": "This is a sample description for resource 23.",
+    "location": "23 Main St, Brooklyn, NY 11223",
+    "phone": "(718) 555-1023",
+    "website": "https://example23.org"
+  },
+  {
+    "title": "Example Resource 24",
+    "category": "Brooklyn-Wide",
+    "subcategory": "Children and Adolescents",
+    "description": "This is a sample description for resource 24.",
+    "location": "24 Main St, Brooklyn, NY 11224",
+    "phone": "(718) 555-1024",
+    "website": "https://example24.org"
+  },
+  {
+    "title": "Example Resource 25",
+    "category": "Flatbush",
+    "subcategory": "Adults (30-50)",
+    "description": "This is a sample description for resource 25.",
+    "location": "25 Main St, Brooklyn, NY 11225",
+    "phone": "(718) 555-1025",
+    "website": "https://example25.org"
+  },
+  {
+    "title": "Example Resource 26",
+    "category": "Brooklyn-Wide",
+    "subcategory": "Adults (30-50)",
+    "description": "This is a sample description for resource 26.",
+    "location": "26 Main St, Brooklyn, NY 11226",
+    "phone": "(718) 555-1026",
+    "website": "https://example26.org"
+  },
+  {
+    "title": "Example Resource 27",
+    "category": "Flatbush",
+    "subcategory": "Children and Adolescents",
+    "description": "This is a sample description for resource 27.",
+    "location": "27 Main St, Brooklyn, NY 11227",
+    "phone": "(718) 555-1027",
+    "website": "https://example27.org"
+  },
+  {
+    "title": "Example Resource 28",
+    "category": "Brooklyn-Wide",
+    "subcategory": "Adults (30-50)",
+    "description": "This is a sample description for resource 28.",
+    "location": "28 Main St, Brooklyn, NY 11228",
+    "phone": "(718) 555-1028",
+    "website": "https://example28.org"
+  },
+  {
+    "title": "Example Resource 29",
+    "category": "Flatbush",
+    "subcategory": "Adults (30-50)",
+    "description": "This is a sample description for resource 29.",
+    "location": "29 Main St, Brooklyn, NY 11229",
+    "phone": "(718) 555-1029",
+    "website": "https://example29.org"
+  },
+  {
+    "title": "Example Resource 30",
+    "category": "Brooklyn-Wide",
+    "subcategory": "Children and Adolescents",
+    "description": "This is a sample description for resource 30.",
+    "location": "30 Main St, Brooklyn, NY 11230",
+    "phone": "(718) 555-1030",
+    "website": "https://example30.org"
+  },
+  {
+    "title": "Example Resource 31",
+    "category": "Flatbush",
+    "subcategory": "Adults (30-50)",
+    "description": "This is a sample description for resource 31.",
+    "location": "31 Main St, Brooklyn, NY 11231",
+    "phone": "(718) 555-1031",
+    "website": "https://example31.org"
+  },
+  {
+    "title": "Example Resource 32",
+    "category": "Brooklyn-Wide",
+    "subcategory": "Adults (30-50)",
+    "description": "This is a sample description for resource 32.",
+    "location": "32 Main St, Brooklyn, NY 11232",
+    "phone": "(718) 555-1032",
+    "website": "https://example32.org"
+  },
+  {
+    "title": "Example Resource 33",
+    "category": "Flatbush",
+    "subcategory": "Children and Adolescents",
+    "description": "This is a sample description for resource 33.",
+    "location": "33 Main St, Brooklyn, NY 11233",
+    "phone": "(718) 555-1033",
+    "website": "https://example33.org"
+  },
+  {
+    "title": "Example Resource 34",
+    "category": "Brooklyn-Wide",
+    "subcategory": "Adults (30-50)",
+    "description": "This is a sample description for resource 34.",
+    "location": "34 Main St, Brooklyn, NY 11234",
+    "phone": "(718) 555-1034",
+    "website": "https://example34.org"
+  },
+  {
+    "title": "Example Resource 35",
+    "category": "Flatbush",
+    "subcategory": "Adults (30-50)",
+    "description": "This is a sample description for resource 35.",
+    "location": "35 Main St, Brooklyn, NY 11235",
+    "phone": "(718) 555-1035",
+    "website": "https://example35.org"
+  },
+  {
+    "title": "Example Resource 36",
+    "category": "Brooklyn-Wide",
+    "subcategory": "Children and Adolescents",
+    "description": "This is a sample description for resource 36.",
+    "location": "36 Main St, Brooklyn, NY 11236",
+    "phone": "(718) 555-1036",
+    "website": "https://example36.org"
+  },
+  {
+    "title": "Example Resource 37",
+    "category": "Flatbush",
+    "subcategory": "Adults (30-50)",
+    "description": "This is a sample description for resource 37.",
+    "location": "37 Main St, Brooklyn, NY 11237",
+    "phone": "(718) 555-1037",
+    "website": "https://example37.org"
+  },
+  {
+    "title": "Example Resource 38",
+    "category": "Brooklyn-Wide",
+    "subcategory": "Adults (30-50)",
+    "description": "This is a sample description for resource 38.",
+    "location": "38 Main St, Brooklyn, NY 11238",
+    "phone": "(718) 555-1038",
+    "website": "https://example38.org"
+  },
+  {
+    "title": "Example Resource 39",
+    "category": "Flatbush",
+    "subcategory": "Children and Adolescents",
+    "description": "This is a sample description for resource 39.",
+    "location": "39 Main St, Brooklyn, NY 11239",
+    "phone": "(718) 555-1039",
+    "website": "https://example39.org"
+  },
+  {
+    "title": "Example Resource 40",
+    "category": "Brooklyn-Wide",
+    "subcategory": "Adults (30-50)",
+    "description": "This is a sample description for resource 40.",
+    "location": "40 Main St, Brooklyn, NY 11240",
+    "phone": "(718) 555-1040",
+    "website": "https://example40.org"
+  },
+  {
+    "title": "Example Resource 41",
+    "category": "Flatbush",
+    "subcategory": "Adults (30-50)",
+    "description": "This is a sample description for resource 41.",
+    "location": "41 Main St, Brooklyn, NY 11241",
+    "phone": "(718) 555-1041",
+    "website": "https://example41.org"
+  },
+  {
+    "title": "Example Resource 42",
+    "category": "Brooklyn-Wide",
+    "subcategory": "Children and Adolescents",
+    "description": "This is a sample description for resource 42.",
+    "location": "42 Main St, Brooklyn, NY 11242",
+    "phone": "(718) 555-1042",
+    "website": "https://example42.org"
+  },
+  {
+    "title": "Example Resource 43",
+    "category": "Flatbush",
+    "subcategory": "Adults (30-50)",
+    "description": "This is a sample description for resource 43.",
+    "location": "43 Main St, Brooklyn, NY 11243",
+    "phone": "(718) 555-1043",
+    "website": "https://example43.org"
+  },
+  {
+    "title": "Example Resource 44",
+    "category": "Brooklyn-Wide",
+    "subcategory": "Adults (30-50)",
+    "description": "This is a sample description for resource 44.",
+    "location": "44 Main St, Brooklyn, NY 11244",
+    "phone": "(718) 555-1044",
+    "website": "https://example44.org"
+  },
+  {
+    "title": "Example Resource 45",
+    "category": "Flatbush",
+    "subcategory": "Children and Adolescents",
+    "description": "This is a sample description for resource 45.",
+    "location": "45 Main St, Brooklyn, NY 11245",
+    "phone": "(718) 555-1045",
+    "website": "https://example45.org"
+  },
+  {
+    "title": "Example Resource 46",
+    "category": "Brooklyn-Wide",
+    "subcategory": "Adults (30-50)",
+    "description": "This is a sample description for resource 46.",
+    "location": "46 Main St, Brooklyn, NY 11246",
+    "phone": "(718) 555-1046",
+    "website": "https://example46.org"
+  },
+  {
+    "title": "Example Resource 47",
+    "category": "Flatbush",
+    "subcategory": "Adults (30-50)",
+    "description": "This is a sample description for resource 47.",
+    "location": "47 Main St, Brooklyn, NY 11247",
+    "phone": "(718) 555-1047",
+    "website": "https://example47.org"
+  },
+  {
+    "title": "Example Resource 48",
+    "category": "Brooklyn-Wide",
+    "subcategory": "Children and Adolescents",
+    "description": "This is a sample description for resource 48.",
+    "location": "48 Main St, Brooklyn, NY 11248",
+    "phone": "(718) 555-1048",
+    "website": "https://example48.org"
+  },
+  {
+    "title": "Example Resource 49",
+    "category": "Flatbush",
+    "subcategory": "Adults (30-50)",
+    "description": "This is a sample description for resource 49.",
+    "location": "49 Main St, Brooklyn, NY 11249",
+    "phone": "(718) 555-1049",
+    "website": "https://example49.org"
+  },
+  {
+    "title": "Example Resource 50",
+    "category": "Brooklyn-Wide",
+    "subcategory": "Adults (30-50)",
+    "description": "This is a sample description for resource 50.",
+    "location": "50 Main St, Brooklyn, NY 11250",
+    "phone": "(718) 555-1050",
+    "website": "https://example50.org"
+  },
+  {
+    "title": "Example Resource 51",
+    "category": "Flatbush",
+    "subcategory": "Children and Adolescents",
+    "description": "This is a sample description for resource 51.",
+    "location": "51 Main St, Brooklyn, NY 11251",
+    "phone": "(718) 555-1051",
+    "website": "https://example51.org"
+  },
+  {
+    "title": "Example Resource 52",
+    "category": "Brooklyn-Wide",
+    "subcategory": "Adults (30-50)",
+    "description": "This is a sample description for resource 52.",
+    "location": "52 Main St, Brooklyn, NY 11252",
+    "phone": "(718) 555-1052",
+    "website": "https://example52.org"
+  },
+  {
+    "title": "Example Resource 53",
+    "category": "Flatbush",
+    "subcategory": "Adults (30-50)",
+    "description": "This is a sample description for resource 53.",
+    "location": "53 Main St, Brooklyn, NY 11253",
+    "phone": "(718) 555-1053",
+    "website": "https://example53.org"
+  },
+  {
+    "title": "Example Resource 54",
+    "category": "Brooklyn-Wide",
+    "subcategory": "Children and Adolescents",
+    "description": "This is a sample description for resource 54.",
+    "location": "54 Main St, Brooklyn, NY 11254",
+    "phone": "(718) 555-1054",
+    "website": "https://example54.org"
+  },
+  {
+    "title": "Example Resource 55",
+    "category": "Flatbush",
+    "subcategory": "Adults (30-50)",
+    "description": "This is a sample description for resource 55.",
+    "location": "55 Main St, Brooklyn, NY 11255",
+    "phone": "(718) 555-1055",
+    "website": "https://example55.org"
+  },
+  {
+    "title": "Example Resource 56",
+    "category": "Brooklyn-Wide",
+    "subcategory": "Adults (30-50)",
+    "description": "This is a sample description for resource 56.",
+    "location": "56 Main St, Brooklyn, NY 11256",
+    "phone": "(718) 555-1056",
+    "website": "https://example56.org"
+  },
+  {
+    "title": "Example Resource 57",
+    "category": "Flatbush",
+    "subcategory": "Children and Adolescents",
+    "description": "This is a sample description for resource 57.",
+    "location": "57 Main St, Brooklyn, NY 11257",
+    "phone": "(718) 555-1057",
+    "website": "https://example57.org"
+  },
+  {
+    "title": "Example Resource 58",
+    "category": "Brooklyn-Wide",
+    "subcategory": "Adults (30-50)",
+    "description": "This is a sample description for resource 58.",
+    "location": "58 Main St, Brooklyn, NY 11258",
+    "phone": "(718) 555-1058",
+    "website": "https://example58.org"
+  },
+  {
+    "title": "Example Resource 59",
+    "category": "Flatbush",
+    "subcategory": "Adults (30-50)",
+    "description": "This is a sample description for resource 59.",
+    "location": "59 Main St, Brooklyn, NY 11259",
+    "phone": "(718) 555-1059",
+    "website": "https://example59.org"
+  },
+  {
+    "title": "Example Resource 60",
+    "category": "Brooklyn-Wide",
+    "subcategory": "Children and Adolescents",
+    "description": "This is a sample description for resource 60.",
+    "location": "60 Main St, Brooklyn, NY 11260",
+    "phone": "(718) 555-1060",
+    "website": "https://example60.org"
+  },
+  {
+    "title": "Example Resource 61",
+    "category": "Flatbush",
+    "subcategory": "Adults (30-50)",
+    "description": "This is a sample description for resource 61.",
+    "location": "61 Main St, Brooklyn, NY 11261",
+    "phone": "(718) 555-1061",
+    "website": "https://example61.org"
+  },
+  {
+    "title": "Example Resource 62",
+    "category": "Brooklyn-Wide",
+    "subcategory": "Adults (30-50)",
+    "description": "This is a sample description for resource 62.",
+    "location": "62 Main St, Brooklyn, NY 11262",
+    "phone": "(718) 555-1062",
+    "website": "https://example62.org"
+  },
+  {
+    "title": "Example Resource 63",
+    "category": "Flatbush",
+    "subcategory": "Children and Adolescents",
+    "description": "This is a sample description for resource 63.",
+    "location": "63 Main St, Brooklyn, NY 11263",
+    "phone": "(718) 555-1063",
+    "website": "https://example63.org"
+  },
+  {
+    "title": "Example Resource 64",
+    "category": "Brooklyn-Wide",
+    "subcategory": "Adults (30-50)",
+    "description": "This is a sample description for resource 64.",
+    "location": "64 Main St, Brooklyn, NY 11264",
+    "phone": "(718) 555-1064",
+    "website": "https://example64.org"
+  },
+  {
+    "title": "Example Resource 65",
+    "category": "Flatbush",
+    "subcategory": "Adults (30-50)",
+    "description": "This is a sample description for resource 65.",
+    "location": "65 Main St, Brooklyn, NY 11265",
+    "phone": "(718) 555-1065",
+    "website": "https://example65.org"
+  },
+  {
+    "title": "Example Resource 66",
+    "category": "Brooklyn-Wide",
+    "subcategory": "Children and Adolescents",
+    "description": "This is a sample description for resource 66.",
+    "location": "66 Main St, Brooklyn, NY 11266",
+    "phone": "(718) 555-1066",
+    "website": "https://example66.org"
+  },
+  {
+    "title": "Example Resource 67",
+    "category": "Flatbush",
+    "subcategory": "Adults (30-50)",
+    "description": "This is a sample description for resource 67.",
+    "location": "67 Main St, Brooklyn, NY 11267",
+    "phone": "(718) 555-1067",
+    "website": "https://example67.org"
+  },
+  {
+    "title": "Example Resource 68",
+    "category": "Brooklyn-Wide",
+    "subcategory": "Adults (30-50)",
+    "description": "This is a sample description for resource 68.",
+    "location": "68 Main St, Brooklyn, NY 11268",
+    "phone": "(718) 555-1068",
+    "website": "https://example68.org"
+  },
+  {
+    "title": "Example Resource 69",
+    "category": "Flatbush",
+    "subcategory": "Children and Adolescents",
+    "description": "This is a sample description for resource 69.",
+    "location": "69 Main St, Brooklyn, NY 11269",
+    "phone": "(718) 555-1069",
+    "website": "https://example69.org"
+  },
+  {
+    "title": "Example Resource 70",
+    "category": "Brooklyn-Wide",
+    "subcategory": "Adults (30-50)",
+    "description": "This is a sample description for resource 70.",
+    "location": "70 Main St, Brooklyn, NY 11270",
+    "phone": "(718) 555-1070",
+    "website": "https://example70.org"
+  },
+  {
+    "title": "Example Resource 71",
+    "category": "Flatbush",
+    "subcategory": "Adults (30-50)",
+    "description": "This is a sample description for resource 71.",
+    "location": "71 Main St, Brooklyn, NY 11271",
+    "phone": "(718) 555-1071",
+    "website": "https://example71.org"
+  },
+  {
+    "title": "Example Resource 72",
+    "category": "Brooklyn-Wide",
+    "subcategory": "Children and Adolescents",
+    "description": "This is a sample description for resource 72.",
+    "location": "72 Main St, Brooklyn, NY 11272",
+    "phone": "(718) 555-1072",
+    "website": "https://example72.org"
+  },
+  {
+    "title": "Example Resource 73",
+    "category": "Flatbush",
+    "subcategory": "Adults (30-50)",
+    "description": "This is a sample description for resource 73.",
+    "location": "73 Main St, Brooklyn, NY 11273",
+    "phone": "(718) 555-1073",
+    "website": "https://example73.org"
+  },
+  {
+    "title": "Example Resource 74",
+    "category": "Brooklyn-Wide",
+    "subcategory": "Adults (30-50)",
+    "description": "This is a sample description for resource 74.",
+    "location": "74 Main St, Brooklyn, NY 11274",
+    "phone": "(718) 555-1074",
+    "website": "https://example74.org"
+  },
+  {
+    "title": "Example Resource 75",
+    "category": "Flatbush",
+    "subcategory": "Children and Adolescents",
+    "description": "This is a sample description for resource 75.",
+    "location": "75 Main St, Brooklyn, NY 11275",
+    "phone": "(718) 555-1075",
+    "website": "https://example75.org"
+  },
+  {
+    "title": "Example Resource 76",
+    "category": "Brooklyn-Wide",
+    "subcategory": "Adults (30-50)",
+    "description": "This is a sample description for resource 76.",
+    "location": "76 Main St, Brooklyn, NY 11276",
+    "phone": "(718) 555-1076",
+    "website": "https://example76.org"
+  },
+  {
+    "title": "Example Resource 77",
+    "category": "Flatbush",
+    "subcategory": "Adults (30-50)",
+    "description": "This is a sample description for resource 77.",
+    "location": "77 Main St, Brooklyn, NY 11277",
+    "phone": "(718) 555-1077",
+    "website": "https://example77.org"
+  },
+  {
+    "title": "Example Resource 78",
+    "category": "Brooklyn-Wide",
+    "subcategory": "Children and Adolescents",
+    "description": "This is a sample description for resource 78.",
+    "location": "78 Main St, Brooklyn, NY 11278",
+    "phone": "(718) 555-1078",
+    "website": "https://example78.org"
+  },
+  {
+    "title": "Example Resource 79",
+    "category": "Flatbush",
+    "subcategory": "Adults (30-50)",
+    "description": "This is a sample description for resource 79.",
+    "location": "79 Main St, Brooklyn, NY 11279",
+    "phone": "(718) 555-1079",
+    "website": "https://example79.org"
+  },
+  {
+    "title": "Example Resource 80",
+    "category": "Brooklyn-Wide",
+    "subcategory": "Adults (30-50)",
+    "description": "This is a sample description for resource 80.",
+    "location": "80 Main St, Brooklyn, NY 11280",
+    "phone": "(718) 555-1080",
+    "website": "https://example80.org"
+  },
+  {
+    "title": "Example Resource 81",
+    "category": "Flatbush",
+    "subcategory": "Children and Adolescents",
+    "description": "This is a sample description for resource 81.",
+    "location": "81 Main St, Brooklyn, NY 11281",
+    "phone": "(718) 555-1081",
+    "website": "https://example81.org"
+  },
+  {
+    "title": "Example Resource 82",
+    "category": "Brooklyn-Wide",
+    "subcategory": "Adults (30-50)",
+    "description": "This is a sample description for resource 82.",
+    "location": "82 Main St, Brooklyn, NY 11282",
+    "phone": "(718) 555-1082",
+    "website": "https://example82.org"
+  },
+  {
+    "title": "Example Resource 83",
+    "category": "Flatbush",
+    "subcategory": "Adults (30-50)",
+    "description": "This is a sample description for resource 83.",
+    "location": "83 Main St, Brooklyn, NY 11283",
+    "phone": "(718) 555-1083",
+    "website": "https://example83.org"
+  },
+  {
+    "title": "Example Resource 84",
+    "category": "Brooklyn-Wide",
+    "subcategory": "Children and Adolescents",
+    "description": "This is a sample description for resource 84.",
+    "location": "84 Main St, Brooklyn, NY 11284",
+    "phone": "(718) 555-1084",
+    "website": "https://example84.org"
+  },
+  {
+    "title": "Example Resource 85",
+    "category": "Flatbush",
+    "subcategory": "Adults (30-50)",
+    "description": "This is a sample description for resource 85.",
+    "location": "85 Main St, Brooklyn, NY 11285",
+    "phone": "(718) 555-1085",
+    "website": "https://example85.org"
+  },
+  {
+    "title": "Example Resource 86",
+    "category": "Brooklyn-Wide",
+    "subcategory": "Adults (30-50)",
+    "description": "This is a sample description for resource 86.",
+    "location": "86 Main St, Brooklyn, NY 11286",
+    "phone": "(718) 555-1086",
+    "website": "https://example86.org"
+  },
+  {
+    "title": "Example Resource 87",
+    "category": "Flatbush",
+    "subcategory": "Children and Adolescents",
+    "description": "This is a sample description for resource 87.",
+    "location": "87 Main St, Brooklyn, NY 11287",
+    "phone": "(718) 555-1087",
+    "website": "https://example87.org"
+  },
+  {
+    "title": "Example Resource 88",
+    "category": "Brooklyn-Wide",
+    "subcategory": "Adults (30-50)",
+    "description": "This is a sample description for resource 88.",
+    "location": "88 Main St, Brooklyn, NY 11288",
+    "phone": "(718) 555-1088",
+    "website": "https://example88.org"
+  },
+  {
+    "title": "Example Resource 89",
+    "category": "Flatbush",
+    "subcategory": "Adults (30-50)",
+    "description": "This is a sample description for resource 89.",
+    "location": "89 Main St, Brooklyn, NY 11289",
+    "phone": "(718) 555-1089",
+    "website": "https://example89.org"
+  },
+  {
+    "title": "Example Resource 90",
+    "category": "Brooklyn-Wide",
+    "subcategory": "Children and Adolescents",
+    "description": "This is a sample description for resource 90.",
+    "location": "90 Main St, Brooklyn, NY 11290",
+    "phone": "(718) 555-1090",
+    "website": "https://example90.org"
+  },
+  {
+    "title": "Example Resource 91",
+    "category": "Flatbush",
+    "subcategory": "Adults (30-50)",
+    "description": "This is a sample description for resource 91.",
+    "location": "91 Main St, Brooklyn, NY 11291",
+    "phone": "(718) 555-1091",
+    "website": "https://example91.org"
+  },
+  {
+    "title": "Example Resource 92",
+    "category": "Brooklyn-Wide",
+    "subcategory": "Adults (30-50)",
+    "description": "This is a sample description for resource 92.",
+    "location": "92 Main St, Brooklyn, NY 11292",
+    "phone": "(718) 555-1092",
+    "website": "https://example92.org"
+  },
+  {
+    "title": "Example Resource 93",
+    "category": "Flatbush",
+    "subcategory": "Children and Adolescents",
+    "description": "This is a sample description for resource 93.",
+    "location": "93 Main St, Brooklyn, NY 11293",
+    "phone": "(718) 555-1093",
+    "website": "https://example93.org"
+  },
+  {
+    "title": "Example Resource 94",
+    "category": "Brooklyn-Wide",
+    "subcategory": "Adults (30-50)",
+    "description": "This is a sample description for resource 94.",
+    "location": "94 Main St, Brooklyn, NY 11294",
+    "phone": "(718) 555-1094",
+    "website": "https://example94.org"
+  },
+  {
+    "title": "Example Resource 95",
+    "category": "Flatbush",
+    "subcategory": "Adults (30-50)",
+    "description": "This is a sample description for resource 95.",
+    "location": "95 Main St, Brooklyn, NY 11295",
+    "phone": "(718) 555-1095",
+    "website": "https://example95.org"
+  },
+  {
+    "title": "Example Resource 96",
+    "category": "Brooklyn-Wide",
+    "subcategory": "Children and Adolescents",
+    "description": "This is a sample description for resource 96.",
+    "location": "96 Main St, Brooklyn, NY 11296",
+    "phone": "(718) 555-1096",
+    "website": "https://example96.org"
+  },
+  {
+    "title": "Example Resource 97",
+    "category": "Flatbush",
+    "subcategory": "Adults (30-50)",
+    "description": "This is a sample description for resource 97.",
+    "location": "97 Main St, Brooklyn, NY 11297",
+    "phone": "(718) 555-1097",
+    "website": "https://example97.org"
+  },
+  {
+    "title": "Example Resource 98",
+    "category": "Brooklyn-Wide",
+    "subcategory": "Adults (30-50)",
+    "description": "This is a sample description for resource 98.",
+    "location": "98 Main St, Brooklyn, NY 11298",
+    "phone": "(718) 555-1098",
+    "website": "https://example98.org"
+  },
+  {
+    "title": "Example Resource 99",
+    "category": "Flatbush",
+    "subcategory": "Children and Adolescents",
+    "description": "This is a sample description for resource 99.",
+    "location": "99 Main St, Brooklyn, NY 11299",
+    "phone": "(718) 555-1099",
+    "website": "https://example99.org"
+  },
+  {
+    "title": "Example Resource 100",
+    "category": "Brooklyn-Wide",
+    "subcategory": "Adults (30-50)",
+    "description": "This is a sample description for resource 100.",
+    "location": "100 Main St, Brooklyn, NY 11200",
+    "phone": "(718) 555-1100",
+    "website": "https://example100.org"
+  }
+];
+
+function renderResources() {
+  const search = document.getElementById('searchInput').value.toLowerCase();
+  const catFilter = document.getElementById('categoryFilter').value;
+  const subFilter = document.getElementById('subcategoryFilter').value;
+  const list = document.getElementById('resourceList');
+  list.innerHTML = '';
+
+  const filtered = resources.filter(res => {
+    const matchesSearch = res.title.toLowerCase().includes(search) || res.description.toLowerCase().includes(search);
+    const matchesCat = catFilter === 'all' || res.category === catFilter;
+    const matchesSub = subFilter === 'all' || res.subcategory === subFilter;
+    return matchesSearch && matchesCat && matchesSub;
+  });
+
+  if (filtered.length === 0) {
+    list.innerHTML = '<p>No results found.</p>';
+    return;
+  }
+
+  
+filtered.forEach(res => {
+  const icon = getIcon(res.subcategory);
+  const card = "<div class=\"card\">" +
+    "<details><summary><strong>" + icon + " " + res.title + "</strong></summary>" +
+    "<p><strong>Neighborhood:</strong> " + res.category + "</p>" +
+    "<p><strong>Focus Area:</strong> " + res.subcategory + "</p>" +
+    "<p>" + res.description + "</p>" +
+    "<p><strong>Location:</strong> " + res.location + "</p>" +
+    "<p><strong>Phone:</strong> " + res.phone + "</p>" +
+    "<p><a href='" + res.website + "' target='_blank'>" + res.website + "</a></p>" +
+    "</details></div>";
+  list.innerHTML += card;
+});
+
+function getIcon(sub) {
+  const icons = {
+    "Children and Adolescents": "🧒",
+    "Adults (30-50)": "🧠",
+    "Older Adults (50+)": "👵",
+    "Women": "🧕",
+    "Men": "🧔",
+    "Families": "👨‍👩‍👧‍👦",
+    "Veterans": "🎖️",
+    "LGBTQ+ Community": "🌈",
+    "Individuals with Disabilities": "♿",
+    "Immigrant and Refugee Populations": "🌍"
+  };
+  return icons[sub] || "📌";
+}
+</script>
+
+</body>
+</html>
